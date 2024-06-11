@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GA4 Event Callback Example</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: salmon;
+            padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+        }
+
+        button {
+            margin: env(safe-area-inset-top, 20px);
+        }
+    </style>
+
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JCWN9RPFMD"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-JCWN9RPFMD', {
+            'debug_mode': true,
+        });
+    </script>
+
+</head>
+
+<body>
+    <div style="background: green; margin-top: 500px;">
+        <h1 id="modeLabel">Mode: {qs_data}</h1>
+        <button id="closeButton" style="font-size: 32px; padding: 40px;">Close</button>
+        <button id="trigButton" style="font-size: 32px; padding: 40px; margin-left: 100px;">Trig</button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode') ?? 'no';
+        document.getElementById('modeLabel').innerText = mode
+
+        // Add event listener to the button
+        document.getElementById('closeButton').addEventListener('click', function () {
+            console.log('start date', new Date().toUTCString());
+            gtag('event', `close_button_click_${mode}`, {
+                'event_category': 'button',
+                'event_label': 'close_botton',
+                'value': 1,
+                'mode': mode,
+                'event_callback': function () {
+                    console.log('callback date', new Date().toUTCString());
+                    setTimeout(() => {
+                        console.log('timeout date', new Date().toUTCString());
+                        window.ReactNativeWebView.postMessage('Hi from PWA');
+                    }, 0)
+                }
+            });
+        });
+
+        // Add event listener to the button
+        document.getElementById('trigButton').addEventListener('click', function () {
+            gtag('event', `trig_button_click_${mode}`, {
+                'event_category': 'button',
+                'event_label': 'click_trig_button',
+                'value': 1,
+                'mode': mode,
+            });
+        });
+    </script>
+</body>
+
+</html>
